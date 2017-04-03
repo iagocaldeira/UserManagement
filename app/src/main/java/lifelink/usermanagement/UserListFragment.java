@@ -1,13 +1,16 @@
 package lifelink.usermanagement;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import lifelink.usermanagement.dummy.DummyContent;
+import java.util.ArrayList;
+
+import lifelink.usermanagement.user.UserContent;
 
 /**
  * A list fragment representing a list of Users. This fragment
@@ -30,7 +33,7 @@ public class UserListFragment extends ListFragment {
      * The fragment's current callback object, which is notified of list item
      * clicks.
      */
-    private Callbacks mCallbacks = sDummyCallbacks;
+    private Callbacks mCallbacks = sUserCallbacks;
 
     /**
      * The current activated item position. Only used on tablets.
@@ -53,7 +56,7 @@ public class UserListFragment extends ListFragment {
      * A dummy implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
      */
-    private static Callbacks sDummyCallbacks = new Callbacks() {
+    private static Callbacks sUserCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(String id) {
         }
@@ -66,16 +69,28 @@ public class UserListFragment extends ListFragment {
     public UserListFragment() {
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+        final String URL = "http://jsonplaceholder.typicode.com/users";
+
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                return WebConsumer.requestContent(URL);
+            }
+
+            @Override
+            protected void onPostExecute(String res) {
+                ArrayList<UserContent.User> users = WebConsumer.serializeJSONRequest(res);
+
+                setListAdapter( new ArrayAdapter<UserContent.User>(getActivity(),
+                        android.R.layout.simple_list_item_1, android.R.id.text1, users));
+            }
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); // we target SDK > API 11
     }
 
     @Override
@@ -106,7 +121,7 @@ public class UserListFragment extends ListFragment {
         super.onDetach();
 
         // Reset the active callbacks interface to the dummy implementation.
-        mCallbacks = sDummyCallbacks;
+        mCallbacks = sUserCallbacks;
     }
 
     @Override
@@ -115,7 +130,7 @@ public class UserListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onItemSelected(UserContent.users.get(position).id);
     }
 
     @Override

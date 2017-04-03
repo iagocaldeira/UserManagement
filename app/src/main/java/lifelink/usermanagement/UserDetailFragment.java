@@ -5,9 +5,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import lifelink.usermanagement.dummy.DummyContent;
+import java.util.ArrayList;
+
+import lifelink.usermanagement.user.UserContent;
 
 /**
  * A fragment representing a single User detail screen.
@@ -25,7 +29,7 @@ public class UserDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
+    private UserContent.User mItem;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -42,7 +46,7 @@ public class UserDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mItem = UserContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
         }
     }
 
@@ -53,7 +57,30 @@ public class UserDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.user_detail)).setText(mItem.details);
+            ListView details_list = (ListView) rootView.findViewById(R.id.user_detail_list);
+
+            ArrayList<String> details = new ArrayList<>();
+            details.add("Id: "+mItem.id );
+            details.add("Name: "+mItem.name );
+            details.add("Username: "+mItem.username );
+            details.add("Email: "+mItem.email );
+            details.add("Street: "+mItem.street );
+            details.add("Suite: "+mItem.suite );
+            details.add("City: "+mItem.city );
+            details.add("Zipcode: "+mItem.zipcode );
+            details.add("Lat: "+mItem.lat );
+            details.add("Lng: "+mItem.lng );
+            details.add("Phone: "+mItem.phone );
+            details.add("Website: "+mItem.website );
+            details.add("Company name: "+mItem.company_name );
+            details.add("Company catch phrase: "+mItem.company_catchPhrase );
+            details.add("Company bs: "+mItem.company_bs );
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                    android.R.layout.simple_list_item_1, details);
+
+            details_list.setAdapter(adapter);
+
         }
 
         return rootView;
